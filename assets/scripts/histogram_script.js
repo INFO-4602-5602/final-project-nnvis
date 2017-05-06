@@ -1,4 +1,3 @@
-var gaussian_on = false;
 
 
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------
@@ -23,16 +22,18 @@ var histogram = d3.histogram()
 function barToolTip(d, svg) {
   svg.append("text")
         .style("font-size", 14)
-        .attr("x", width*0.8)
-        .attr("y", 40).attr("class", "tooltip")
+        .attr("x", histogram_width*0.75)
+        .attr("y", 0).attr("class", "tooltip")
+        .style("font-size", 12)
         .text(function() {
-          return "Range: ["+d.x0.toFixed(4)+", "+d.x1.toFixed(4)+"]";
+          return "Range: ["+d.x0.toFixed(4)+", "+d.x1.toFixed(3)+"]";
         });
   
   svg.append("text")
         .style("font-size", 14)
-        .attr("x", width*0.8)
-        .attr("y", 70).attr("class", "tooltip")
+        .attr("x", histogram_width*0.75)
+        .attr("y", 15).attr("class", "tooltip")
+        .style("font-size", 12)
         .text(function() {
           return "Count: " + d.length;
         });
@@ -88,7 +89,7 @@ function refreshBars(model_name, weight_data, stats_data, test_accuracy, histo_g
         var new_y = yScale(d.length);
         return "translate("+ new_x +", "+ new_y +")";
       })
-      .attr("height", function(d) { return height - yScale(d.length) })
+      .attr("height", function(d) { return histogram_height - yScale(d.length) })
       .style("fill", function(d) { 
         return model_color; 
       });
@@ -104,32 +105,43 @@ function refreshBars(model_name, weight_data, stats_data, test_accuracy, histo_g
   // Update mean line
   mean_line.transition().duration(400)
               .attr("x1", xScale(mean))  
-              .attr("y1", 0)
+              .attr("y1", mean_line_y_shift)
               .attr("x2", xScale(mean))  
-              .attr("y2", height - margin.top - margin.bottom)
-              .style("stroke-width", 4)
+              .attr("y2", histogram_height)
+              .style("stroke-width", 6)
               .style("stroke", "red")
               .style("fill", "none");
   
   // Update mean text
+  var mean_text = d3.select("#mean_line_text_"+model_name);
+  mean_text.transition().duration(400)
+            .attr("x", xScale(mean)+5)  
+            .attr("y", -10)  
+            .style("font-size", stats_font_size)
+            .text("Mean");
+  
+  // Update mean text
   var mean_text = d3.select("#mean_text_"+model_name);
   mean_text.transition().duration(400)
-            .attr("x", xScale(mean))  
-            .attr("y", -5)
+            .attr("x", histogram_width)  
+            .attr("y", -30)  
+            .style("font-size", stats_font_size)
             .text(function() { return "Mean: " + mean.toFixed(5); });
   
   // Update variance text
   var variance_text = d3.select("#variance_text_"+model_name);
   variance_text.transition().duration(400)
-            .attr("x", width*0.85)  
-            .attr("y", -5)
+            .attr("x", histogram_width)  
+            .attr("y", -15)  
+            .style("font-size", stats_font_size)
             .text(function() { return "Variance: " + variance.toFixed(5); });
   
   // Update std text
   var std_text = d3.select("#std_text_"+model_name);
   std_text.transition().duration(400)
-            .attr("x", width*0.85)  
-            .attr("y", 15)
+            .attr("x", histogram_width)  
+            .attr("y", 0)  
+            .style("font-size", stats_font_size)
             .text(function() { return "STD: " + std.toFixed(5); });
   
 }
@@ -175,7 +187,7 @@ function updateHistogram(h) {
     
     // Refresh Gaussian
     if (gaussian_on) {
-      refreshGaussian(weight_data);
+      refreshGaussian(stats_data, model_name);
     }
   }
 }
@@ -194,7 +206,7 @@ function updateHistogram(h) {
 //                CREATE the Histogram
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------
 function createHistogram(weight_data, stats_data, test_accuracy_score, model_name, histo_g) {
-    console.log(stats_data);
+    
     // Format model name for printing
     var print_name = model_name.replace("_", " ");
     print_name = print_name.charAt(0).toUpperCase() + print_name.slice(1);
@@ -218,7 +230,7 @@ function createHistogram(weight_data, stats_data, test_accuracy_score, model_nam
     // Add the x axis
     histo_g.append("g")
         .attr("id", "x_axis_"+model_name)
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + histogram_height + ")")
         .call(d3.axisBottom(xScale));
   
   // Add the y Axis
@@ -263,7 +275,7 @@ function createHistogram(weight_data, stats_data, test_accuracy_score, model_nam
         .attr("class", "bar")
         .attr("x", 1)
         .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1 ; })
-        .attr("height", function(d) { return height - yScale(d.length); })
+        .attr("height", function(d) { return histogram_height - yScale(d.length); })
         .attr("transform", function(d) {
             return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
         .style("fill", model_color)
@@ -292,33 +304,43 @@ function createHistogram(weight_data, stats_data, test_accuracy_score, model_nam
     histo_g.append("line")
               .attr("id", "mean_line_"+model_name)
               .attr("x1", xScale(mean))  
-              .attr("y1", 0)
+              .attr("y1", mean_line_y_shift)
               .attr("x2", xScale(mean))  
-              .attr("y2", height - margin.top - margin.bottom)
-              .style("stroke-width", 4)
+              .attr("y2", histogram_height)
+              .style("stroke-width", 6)
               .style("stroke", "red")
               .style("fill", "none");
   
+    // Mean text on line
+    histo_g.append("text")
+              .attr("id", "mean_line_text_"+model_name)
+              .attr("x", xScale(mean)+5)  
+              .attr("y", -10)  
+              .style("font-size", stats_font_size)
+              .text("Mean");
+    
     // Mean text
     histo_g.append("text")
               .attr("id", "mean_text_"+model_name)
-              .attr("x", xScale(mean))  
-              .attr("y", -5)
+              .attr("x", histogram_width)  
+              .attr("y", -30)  
+              .style("font-size", stats_font_size)
               .text(function() { return "Mean: " + mean.toFixed(5); });
-  
   
     // Variance text
     histo_g.append("text")
               .attr("id", "variance_text_"+model_name)
-              .attr("x", width*0.85)  
-              .attr("y", -5)
+              .attr("x", histogram_width)  
+              .attr("y", -15)  
+              .style("font-size", stats_font_size)
               .text(function() { return "Variance: " + variance.toFixed(5); });
 
     // Std text
     histo_g.append("text")
               .attr("id", "std_text_"+model_name)
-              .attr("x", width*0.85)  
-              .attr("y", 15)
+              .attr("x", histogram_width)  
+              .attr("y", 0)  
+              .style("font-size", stats_font_size)
               .text(function() { return "STD: " + std.toFixed(5); });
 }
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------
@@ -343,10 +365,20 @@ function initializeHistogram(data, model_name) {
                           .attr("id", "histo_group_"+histo_svg_id)
                           .attr("class", "histo_groups")
                           .attr("transform", 
-                                "translate(" + margin.left + "," + (margin.top+20) + ")");
+                                "translate(" + margin.left + "," + (margin.top+histogram_height*0.25) + ")");
   
   
+  // Set container for gaussian overlay
+  var gauss_g = histo_svg.append("g")
+                          .attr("id", "gauss_group_"+model_name)
+          .attr("transform", "translate("+(width+margin.left - gauss_width)+","+(margin.top+histogram_height*0.25)+")");
   
+  gauss_g.append("rect")
+          .attr("id", "gauss_plot_"+model_name)
+          .attr("height", gauss_height)
+          .attr("width", gauss_width)
+          .style("fill", "white")
+          .style("opacity", 0.75);
   
   // Set weight adat and score for creating histogram plot
   var weight_data = data["weight_data"];
@@ -358,7 +390,7 @@ function initializeHistogram(data, model_name) {
   
   // Create Gaussian
   if (gaussian_on) {
-    createGaussianOverlay(weight_data, stats_data);
+    createGaussianOverlay(stats_data, gauss_g, model_name);
   }
 }
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------

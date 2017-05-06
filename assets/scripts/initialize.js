@@ -19,14 +19,23 @@ var epoch_count;
 // Plotting / chart parameters
 var margin = {top: 20, right: 30, bottom: 20, left: 40},
     width = 960 - margin.left - margin.right,
-    height = 250 - margin.top - margin.bottom;
+    height = 300 - margin.top - margin.bottom,
+    histogram_width = width * 0.75,
+    histogram_height = height * 0.75,
+    gauss_height = height*0.75,
+    gauss_width = width*0.25,
+    gauss_plot_width = gauss_width,
+    gauss_plot_height = gauss_height*0.85,
+    gauss_plot_margin = {"top" : (gauss_height*0.25)/2, "left" : (gauss_plot_width*0.25)/2};
 
 
 
-var weight_data;
+var gaussian_on = true;
+var stats_font_size = 12;
+var mean_line_y_shift = -20;
+
+
 var current_epoch;
-var full_model_data;
-var model_data;
 var prev_hover_color;
 
 
@@ -35,19 +44,28 @@ var prev_hover_color;
 // -------*****--------^^^^-------*****--------
 var xScale = d3.scaleLinear()
           .domain([-0.15, 0.15])
-          .range([0, width]);
+          .range([0, histogram_width]);
 
 var yScale = d3.scaleLinear()
-          .range([height, 0]);
+          .range([histogram_height, 0]);
 
 
 var sliderScale = d3.scaleLinear()
-                .range([0, width])
+                .range([0, histogram_width])
                 .clamp(true);
 
 var colorScale = d3.scaleLinear()
                     .domain([0, 0.9, 1.0])
                     .range(colors);
+
+var selectionColorScale = d3.scaleLinear()
+                          .range(colors);
+
+var gauss_xScale = d3.scaleLinear()
+                    .range([0, gauss_plot_width]);
+
+var gauss_yScale = d3.scaleLinear()
+                    .range([gauss_plot_height, 0]);
 // -------*****--------^^^^-------*****--------
 
 
@@ -67,7 +85,7 @@ function initializeModelFrame(model_id) {
   
   var model_svg = model_div.append("svg").attr("id", "model_"+model_id+"_svg")
                             .attr("width", width + margin.left + margin.right)
-                            .attr("height", height*1.1 + margin.top + margin.bottom);
+                            .attr("height", height + margin.top + margin.bottom);
   // Set group for histogram
   model_svg.append("g")
             .attr("id", "model_"+model_id+"_histogram_group")
@@ -217,6 +235,9 @@ function model_click(d) {
     // Hide div
     var histo_plot_div = d3.select("#"+histo_plot_id+"_div");
     histo_plot_div.transition().duration(400).style("display", "none");
+    
+    // Remove Gauss overlay
+    d3.select("#gauss_group_"+model_name).remove();
   }
   
   // Check if slider should be hidden or unhidden
@@ -262,7 +283,6 @@ function initializeSelectionFrame() {
     .attr("y", 20)
     .text("Model Selection")
     .style("font-size", 24)
-    .style("fill", "white")
     .style("stroke", "black");
   
   
@@ -275,7 +295,21 @@ function initializeSelectionFrame() {
   var accuracyScale = d3.scaleLinear()
                             .domain([0.0, 1.0])
                             .range([height-margin.bottom, 0+margin.top]);
-
+  
+  // Set selectionColorScale domain
+  // 0. Get accuracies
+  var model_max_accuracies = [];
+  for (var model in MODELS) {
+    var model_max_accuracy = MODELS[model]["max_test_accuracy"];
+    model_max_accuracies.push(model_max_accuracy);
+  }
+  
+  var accuracy_min = d3.min(model_max_accuracies);
+  var accuracy_max = d3.max(model_max_accuracies);
+  
+  // 1. Set domain
+  selectionColorScale.domain([accuracy_min, accuracy_max*0.9, accuracy_max]);
+  
   //-------//-------//-------//-------//-------//-------//-------//-------
   
   var model_num = 0;
@@ -288,6 +322,10 @@ function initializeSelectionFrame() {
     var model_obj = MODELS[model_key];
     var model_arch = model_obj["architecture_data"];
     var max_accuracy = model_obj["max_test_accuracy"];
+    
+    
+    
+    
     
     // Set the mark data
     var mark_data = [{ "name" : model_key, 
@@ -302,15 +340,16 @@ function initializeSelectionFrame() {
                 return modelNumScale(model_num);
               })
               .attr("cy", function(d) {
-                var test_accuracy = d["max_accuracy"];
-                return accuracyScale(test_accuracy);
+                var max_test_accuracy = d["max_accuracy"];
+                return accuracyScale(max_test_accuracy);
               })
               .attr("r", 40);
     
     // Set mark styles
     model_mark.style("fill", function(d) {
-                var test_accuracy = d["max_accuracy"];
-                return colorScale(test_accuracy);
+                var max_test_accuracy = d["max_accuracy"];
+      console.log(max_test_accuracy);
+                return selectionColorScale(max_test_accuracy);
               })
               .style("stroke", "black") 
               .style("opacity", 0.0);
@@ -489,7 +528,7 @@ function load_file(model_information, load_index, total_model_num) {
 
 
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------
-//                           
+//                        Initialize Model Selection Frame
 // -------*****--------^^^^-------*****---------------*****--------^^^^-------*****--------
 function initializeModelSelection(models) {
   

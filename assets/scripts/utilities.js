@@ -46,7 +46,7 @@ function createSlider() {
   }
   
   // Add Text
-  svg.append("text").attr("x", width*0.5).attr("y", 80).text("Training Epochs");
+  svg.append("text").attr("x", histogram_width*0.5).attr("y", 80).text("Training Epochs");
   
 }
 

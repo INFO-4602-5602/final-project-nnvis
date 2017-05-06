@@ -25,12 +25,3 @@ function describe_stats(data) {
 }
 
 
-function gaussian(x) {
-  var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
-		mean = 0,
-    	sigma = 1;
-
-  x = (x - mean) / sigma;
-  
-  return gaussianConstant * Math.exp(-.5 * x * x) / sigma;
-}
