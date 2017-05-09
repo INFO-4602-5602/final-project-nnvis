@@ -7,7 +7,7 @@ Despite the burgeoning success of Deep Neural Networks (DNNs) and their pervasio
 
 * **Michael Iuzzolino**
 
-<h2>How to run the project<h2>
+<h2>How to run the project</h2>
 
 To run the project you must first download this repository, followed by the necessary model files:
 
