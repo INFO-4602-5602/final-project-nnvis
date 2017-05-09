@@ -1,30 +1,23 @@
 # Final Project
-For your final project, use the skills you've developed in this class to tackle a new problem. For example, you could develop a visualization for a complex dataset, construct a physicalization, visualize an algorithmic process, or run an experiment to explore graphical perception. Be creative and have fun! 
 
-<h2>Requirements:</h2>
-<h3>Proposal:</h3>
-Please submit a preliminary project proposal that outlines your project's motivating problem and workplan describing what you intend to accomplish to Dr. Szafir via email by Monday, 4.25 at 11:59pm (please send a single email per group with all group members CC'ed). This will take place of that week's reading assignment. I will provide you with guiding feedback for your project and a set of expectations based on this proposal.   
+<h2>Abstract</h2>
+Despite the burgeoning success of Deep Neural Networks (DNNs) and their pervasion into myriad domains, ranging from art and music to science and medicine, their deep and complex architectures, innumerable parameters, and nonlinear activations render their inner workings nearly incomprehensible. This 'black box' nature of DNNs prohibits not only a robust intellectual understanding for academic endeavors and optimization engineering, but it also restricts these models and their exceptional pattern-recognition power to expert-users. Importantly, the lack of understanding how and why a DNN makes any particular decision also leads to significant legal liability for self-driving automobile companies and medical institutions. Interactive visualizations of DNNs may provide both expert and non-expert users the insight and intuition required to more optimally architect DNNs, as well as foster more confidence in their inner workings or reveal pitfalls to which solutions may be engineered. Based upon a review of current deep neural network visualization techniques, we have developed an interactive comparative visualization of DNN layer parameters and their distributions as they change with time-steps (epochs) in the DNN training sequence.
 
-Please note that this is the latest deadline that I would like to see the proposal by. I'd recommend you submit earlier to give yourself more time to work on the final project. I will provide feedback for all proposals sent before the deadline within 24 hours.   
+<h2>The Team</h2>
 
-<h3>Deliverables:</h3>
-You will be graded on both the artifacts you generate as part of this project and a project write-up. As stated above, expectations for the artifacts will be provided as feedback for your proposal.   
+* **Michael Iuzzolino**
 
-You should approach the write-up like a research paper. It should contain the following sections: 
-<ul>
-<li>A 1-paragraph abstract that summarizes your motivating problem, what you did, and what you found. </li>
-<li>An introduction that describes the motivating problem and why it's interesting or important. </li> 
-<li>A related work section that summarizes research related to your project (minimum eight citations). </li>
-<li>A detailed description of your project and justifications for any design elements. </li>
-<li>A discussion of what you found.</li>
-</ul>
+<h2>How to run the project<h2>
 
-The write-up should be a <b>minimum</b> of two pages using the IEEE VIS Poster Format: http://junctionpublishing.org/vgtc/Tasks/camera.html
+To run the project you must first download this repository, followed by the necessary model files:
 
-As with Project 1, please email me a confidential post-mortem that outlines your roles, how you'd rate your own contribution, and how you'd rate the contributions of your teammates. 
-
-<h2>Submission</h2>
-Final projects are due 11:59pm on 5.5; however, you will have a no-cost extension until 5.8 at 11:59pm. Note that due to University grading deadlines, late projects will not be accepted.    
+**json_files** <a href="https://www.dropbox.com/sh/l5myz84ks98foxk/AACsj1utu41YuvgyX3n7xxMya?dl=0"> json_files </a>
 
 
-Please upload all deliverables through GitHub Classroom. This includes any code, data, documentation, or write-up. If you have physical artifacts, please either reach out to me to set up an appointment to present your artifacts or submit an explanatory video and/or set of photographs. 
+Place the json_files into this repo's json_files directory.
+
+Navigate to the repo in command line and run the command:
+<code>
+python -m http.server 8888
+</code>
+Navigate in-browser to <code> localhost:8888 </code> to launch the visualization.
