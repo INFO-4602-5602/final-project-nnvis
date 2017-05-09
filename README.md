@@ -1,7 +1,12 @@
 # Final Project
 
+<h1> Deep Neural Networks - Model Comparison Visualization
 <h2>Abstract</h2>
 Despite the burgeoning success of Deep Neural Networks (DNNs) and their pervasion into myriad domains, ranging from art and music to science and medicine, their deep and complex architectures, innumerable parameters, and nonlinear activations render their inner workings nearly incomprehensible. This 'black box' nature of DNNs prohibits not only a robust intellectual understanding for academic endeavors and optimization engineering, but it also restricts these models and their exceptional pattern-recognition power to expert-users. Importantly, the lack of understanding how and why a DNN makes any particular decision also leads to significant legal liability for self-driving automobile companies and medical institutions. Interactive visualizations of DNNs may provide both expert and non-expert users the insight and intuition required to more optimally architect DNNs, as well as foster more confidence in their inner workings or reveal pitfalls to which solutions may be engineered. Based upon a review of current deep neural network visualization techniques, we have developed an interactive comparative visualization of DNN layer parameters and their distributions as they change with time-steps (epochs) in the DNN training sequence.
+
+<h2>Demo</h2>
+![GitHub Logo](/readme_imgs/interface_demo.gif)
+
 
 <h2>The Team</h2>
 
